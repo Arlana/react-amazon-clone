@@ -4,8 +4,11 @@ import CurrencyFormat from "react-currency-format";
 // import { SportsBasketball } from '@material-ui/icons';
 import { useStateValue } from './StateProvider';
 import { getBasketTotal } from './reducer';
+import { useHistory } from 'react-router';
 
 function Subtotal() {
+
+    const history = useHistory(); // save history of browser (use it to push "/payment" page after button "Proceed to checkout")
     const [{basket}] = useStateValue();// object basket to pull data by keywords
 
     return (
@@ -29,7 +32,7 @@ function Subtotal() {
                 prefix={"$"}
             />
 
-            <button>Proceed to Checkout</button>
+            <button onClick={e => history.push('/payment')}>Proceed to Checkout</button>
         </div>
     )
 }
