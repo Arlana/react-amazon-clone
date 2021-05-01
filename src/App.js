@@ -1,67 +1,71 @@
-import React, {useEffect} from 'react';
-import './App.css';
-import Header from './Header';
-import Home from './Home';
+import React, { useEffect } from "react";
+import "./App.css";
+import Header from "./Header";
+import Home from "./Home";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
-import Checkout from './Checkout';
-import Login from './Login';
+import Checkout from "./Checkout";
+import Login from "./Login";
+import Payment from "./Payment";
+// import Orders from "./Orders";
 import { auth } from "./firebase";
-import { useStateValue } from './StateProvider';
-import Payment from './Payment';
+import { useStateValue } from "./StateProvider";
+import { loadStripe } from "@stripe/stripe-js";
+import { Elements } from "@stripe/react-stripe-js";
+
+const promise = loadStripe("pk_test_51IkRjDJsQn8iWYnPv1DJR47abdfa5laIxsQMM59YTgSWWlqSBEphLIJoiPYgvLNvukkssScrMU7IqoYfTWMkE93900a9Jb3p2L");
 
 function App() {
-  const [{ }, dispatch] = useStateValue();
+  const [{}, dispatch] = useStateValue();
 
   useEffect(() => {
-    //will run once the App component loads
-    //Listener
-    auth.onAuthStateChanged(authUser => {
-      console.log('The user is >>> ', authUser);
+    // will only run once when the app component loads...
+
+    auth.onAuthStateChanged((authUser) => {
+      // console.log("THE USER IS >>> ", authUser);
 
       if (authUser) {
-        //User just logged in  / was logged in
+        // the user just logged in / the user was logged in
+
         dispatch({
-          type: 'SET_USER',
-          user: authUser
-        })
+          type: "SET_USER",
+          user: authUser,
+        });
       } else {
-        //user is logged out
+        // the user is logged out
         dispatch({
-          type: 'SET_USER',
-          user: null
-        })
+          type: "SET_USER",
+          user: null,
+        });
       }
-    })
-  }, [])
+    });
+  }, []);
 
   return (
     <Router>
       <div className="app">
-
         <Switch>
-
-          <Route path="/payment">
+          <Route path='/orders'>
             <Header />
-            <Payment />
+            <Orders />
           </Route>
-
-          <Route path="/login">
+          <Route path='/login'>
             <Login />
           </Route>
-
-          <Route path="/checkout">
+          <Route path='/checkout'>
             <Header />
             <Checkout />
           </Route>
-
-          {/* Main page(DEFAULT) always at the BOTTOM of all routes */}
-          <Route path="/">
+          <Route path='/payment'>
+            <Header />
+            <Elements stripe={promise}>
+              <Payment />
+            </Elements>
+          </Route>
+          <Route path='/'>
             <Header />
             <Home />
           </Route>
-
         </Switch>
-        
       </div>
     </Router>
   );
